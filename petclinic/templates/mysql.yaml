@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.services.mysql.name }}
+  labels:
+    app: {{ .Values.services.mysql.name }}
+spec:
+  replicas: {{ .Values.services.mysql.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.services.mysql.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.services.mysql.name }}
+    spec:
+      containers:
+      - name: {{ .Values.services.mysql.name }}
+        image: "{{ .Values.services.mysql.image.name }}:{{ .Values.services.mysql.image.tag }}"
+        ports:
+        - containerPort: {{ .Values.services.mysql.port }}
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.services.mysql.secretName }}          # Name of the Kubernetes Secret
+              key: mysql-root-password
+        - name: MYSQL_DATABASE
+          value: {{ .Values.services.mysql.database }}                # Name of the initial database to create
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.services.mysql.secretName }}          # Name of the Kubernetes Secret
+              key: mysql-user           # Key holding the MySQL user
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.services.mysql.secretName }}          # Name of the Kubernetes Secret
+              key: mysql-password         # Key holding the MySQL user password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.services.mysql.name }}
+spec:
+  selector:
+    app: {{ .Values.services.mysql.name }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.services.mysql.port }}
+      targetPort: 3306
+  type: ClusterIP

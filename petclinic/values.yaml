@@ -1,0 +1,71 @@
+services:
+
+  api-gateway:
+    name: api-gateway
+    port: 8080
+    replicaCount: 2
+    image:
+      name: abdullahawad00/api-gateway
+      tag: v4.0
+
+  admin-server:
+    name: admin-server
+    port: 9090
+    replicaCount: 1
+    image:
+      name: abdullahawad00/admin-server
+      tag: v4.0
+
+  config-server:
+    name: config-server
+    port: 8888
+    replicaCount: 1
+    image:
+      name: abdullahawad00/config-server
+      tag: v4.0
+
+  discovery-server:
+    name: discovery-server
+    port: 8761
+    replicaCount: 1
+    image:
+      name: abdullahawad00/discovery-server
+      tag: v4.0
+
+  customers-service:
+    name: customers-service
+    port: 8081
+    replicaCount: 1
+    image:
+      name: abdullahawad00/customers-service
+      tag: v4.0
+
+  visits-service:
+    name: visits-service
+    port: 8082
+    replicaCount: 1
+    image:
+      name: abdullahawad00/visits-service
+      tag: v4.0
+
+  vets-service:
+    name: vets-service
+    port: 8083
+    replicaCount: 1
+    image:
+      name: abdullahawad00/vets-service
+      tag: v4.0
+
+  mysql:
+    name: mysql
+    port: 3307
+    replicaCount: 1
+    image:
+      name: abdullahawad00/mysql
+      tag: v2.0
+    secretName: secret
+    database: petclinic
+    credentials:
+      user: user
+      password: petclinic
+      rootPassword: petclinic

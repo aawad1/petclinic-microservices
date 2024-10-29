@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{  index .Values.services "api-gateway" "name" }}
+  labels:
+    app: {{  index .Values.services "api-gateway" "name" }}
+spec:
+  replicas: {{  index .Values.services "api-gateway" "replicaCount" }}
+  selector:
+    matchLabels:
+      app: {{  index .Values.services "api-gateway" "name" }}
+  template:
+    metadata:
+      labels:
+        app: {{  index .Values.services "api-gateway" "name" }}
+    spec:
+      containers:
+      - name: {{  index .Values.services "api-gateway" "name" }}
+        image: '{{ index .Values.services "api-gateway" "image" "name" }}:{{ index .Values.services "api-gateway" "image" "tag" }}'
+        ports:
+        - containerPort: {{  index .Values.services "api-gateway" "port" }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{  index .Values.services "api-gateway" "name" }}
+spec:
+  selector:
+    app: {{  index .Values.services "api-gateway" "name" }}
+  ports:
+    - protocol: TCP
+      port: {{ index .Values.services "api-gateway" "port" }}
+      targetPort: {{ index .Values.services "api-gateway" "port" }}
+  type: ClusterIP

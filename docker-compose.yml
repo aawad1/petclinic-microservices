@@ -1,6 +1,31 @@
 version: '3'
 
 services:
+  mysql:
+    image: abdullahawad00/mysql:v2.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: petclinic
+      MYSQL_DATABASE: petclinic
+      MYSQL_USER: user
+      MYSQL_PASSWORD: petclinic
+
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - petclinic-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+
   config-server:
     image: springcommunity/spring-petclinic-config-server
     container_name: config-server
@@ -14,7 +39,9 @@ services:
       timeout: 5s
       retries: 10
     ports:
-     - 8888:8888
+      - 8888:8888
+    networks:
+      - petclinic-network
 
   discovery-server:
     image: springcommunity/spring-petclinic-discovery-server
@@ -32,7 +59,9 @@ services:
       config-server:
         condition: service_healthy
     ports:
-     - 8761:8761
+      - 8761:8761
+    networks:
+      - petclinic-network
 
   customers-service:
     image: springcommunity/spring-petclinic-customers-service
@@ -46,8 +75,12 @@ services:
         condition: service_healthy
       discovery-server:
         condition: service_healthy
+      mysql:
+        condition: service_healthy
     ports:
-    - 8081:8081
+      - 8081:8081
+    networks:
+      - petclinic-network
 
   visits-service:
     image: springcommunity/spring-petclinic-visits-service
@@ -61,8 +94,12 @@ services:
         condition: service_healthy
       discovery-server:
         condition: service_healthy
+      mysql:
+        condition: service_healthy
     ports:
-     - 8082:8082
+      - 8082:8082
+    networks:
+      - petclinic-network
 
   vets-service:
     image: springcommunity/spring-petclinic-vets-service
@@ -76,8 +113,12 @@ services:
         condition: service_healthy
       discovery-server:
         condition: service_healthy
+      mysql:
+        condition: service_healthy
     ports:
-     - 8083:8083
+      - 8083:8083
+    networks:
+      - petclinic-network
 
   api-gateway:
     image: springcommunity/spring-petclinic-api-gateway
@@ -92,7 +133,9 @@ services:
       discovery-server:
         condition: service_healthy
     ports:
-     - 8080:8080
+      - 8080:8080
+    networks:
+      - petclinic-network
 
   tracing-server:
     image: openzipkin/zipkin
@@ -102,9 +145,11 @@ services:
         limits:
           memory: 512M
     environment:
-    - JAVA_OPTS=-XX:+UnlockExperimentalVMOptions -Djava.security.egd=file:/dev/./urandom
+      - JAVA_OPTS=-XX:+UnlockExperimentalVMOptions -Djava.security.egd=file:/dev/./urandom
     ports:
-     - 9411:9411
+      - 9411:9411
+    networks:
+      - petclinic-network
 
   admin-server:
     image: springcommunity/spring-petclinic-admin-server
@@ -119,9 +164,9 @@ services:
       discovery-server:
         condition: service_healthy
     ports:
-     - 9090:9090
-
-  ## Grafana / Prometheus
+      - 9090:9090
+    networks:
+      - petclinic-network
 
   grafana-server:
     build: ./docker/grafana
@@ -131,7 +176,9 @@ services:
         limits:
           memory: 256M
     ports:
-    - 3000:3000
+      - 3000:3000
+    networks:
+      - petclinic-network
 
   prometheus-server:
     build: ./docker/prometheus
@@ -141,4 +188,13 @@ services:
         limits:
           memory: 256M
     ports:
-    - 9091:9090
+      - 9091:9090
+    networks:
+      - petclinic-network
+
+networks:
+  petclinic-network:
+    driver: bridge
+
+volumes:
+      mysql-data:

@@ -2,7 +2,7 @@ spring:
   application:
     name: visits-service
   config:
-    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888/}
+    import: optional:configserver:${CONFIG_SERVER_URL:http://config-server:8888/}
 
 
 ---
@@ -11,3 +11,19 @@ spring:
     activate:
       on-profile: docker
     import: configserver:http://config-server:8888
+  datasource:
+    url: jdbc:mysql://mysql:3307/petclinic
+    username: user
+    password: petclinic
+  jpa:
+    generate:
+      ddl: true
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL8DBDialect
+    show-sql: true
+  sql:
+    init:
+      mode: always       # Ensures that schema.sql and data.sql will always run
+      schema-locations: /home/aawad00/projects/petclinic3/spring-petclinic-visits-service/src/main/resources/db/mysql/schema.sql  # Pointing to your custom schema location
+      data-locations: /home/aawad00/projects/petclinic3/spring-petclinic-visits-service/src/main/resources/db/mysql/data.sql      # Pointing to your custom data location

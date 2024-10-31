@@ -12,8 +12,8 @@ pipeline {
             steps {
                 echo "This is the building stage"
 
-                sh "./mvnw clean install"
-                sh "./mvnw clean package"
+                sh "mvn clean install"
+                sh "mvn clean package"
 
                 echo "Building docker images"
                 sh "docker build -t abdullahawad00/config-server -f spring-petclinic-config-server/Dockerfile spring-petclinic-config-server/"

@@ -5,7 +5,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Checking out git repo aawad1/petclinic-microservices'
-                git "https://github.com/aawad1/petclinic-microservices.git"
+                git url: "https://github.com/aawad1/petclinic-microservices.git", branch: "main"
             }
         }
         stage('Build') {
